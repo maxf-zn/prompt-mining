@@ -25,8 +25,13 @@ from prompt_mining.storage.base import StorageBackend
 from prompt_mining.registry.sqlite_registry import SQLiteRegistry, compute_run_key, compute_processing_fingerprint
 from prompt_mining.utils.inference import get_topk_logits, resolve_positions, resolve_layers
 from prompt_mining.utils.gpu import clear_gpu_memory
-from circuit_tracer import attribute
-from circuit_tracer.graph import prune_graph, compute_node_influence
+
+try:
+    from circuit_tracer import attribute
+    from circuit_tracer.graph import prune_graph, compute_node_influence
+    HAS_CIRCUIT_TRACER = True
+except ImportError:
+    HAS_CIRCUIT_TRACER = False
 
 
 @dataclass
@@ -385,6 +390,11 @@ class PromptRunner:
                     topk_probs=topk_probs
                 )
             else:
+                if not HAS_CIRCUIT_TRACER:
+                    raise ImportError(
+                        "circuit_tracer is required for attribution but is not installed. "
+                        "See https://github.com/safety-research/circuit-tracer"
+                    )
                 # Run attribution via circuit_tracer
                 try:
                     # Step 1: Build full graph with max_feature_nodes limit

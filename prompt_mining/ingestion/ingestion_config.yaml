@@ -1,0 +1,209 @@
+# Ingestion Pipeline Configuration
+# Usage: python scripts/run_ingestion.py scripts/ingestion_config.yaml
+
+# Model Configuration (shared across all jobs)
+model:
+  name: meta-llama/Llama-3.1-8B-Instruct
+  backend: huggingface  # Options: "circuit_tracer", "saelens", or "huggingface"
+  dtype: float32
+  enable_attribution: false  # Set to true to compute attribution graphs
+  device_map: auto  # For huggingface backend: "auto", "balanced", or custom mapping
+
+  # For saelens/huggingface backend:
+  sae_configs:
+    - sae_release: llama-3.1-8b-instruct-andyrdt
+      sae_id: resid_post_layer_27_trainer_1
+
+  # For circuit_tracer backend (uncomment and comment out sae_configs):
+  # backend: circuit_tracer
+  # transcoder_set: mwhanna/qwen3-1.7b-transcoders-lowl0
+
+# Run Configuration (controls what artifacts are generated)
+run:
+  topk_logits: 10
+  max_new_tokens: 0  # Set > 0 to enable text generation
+  max_context_length: 16384  # Skip prompts exceeding this token count (prevents OOM)
+  seed: 42
+
+  # Activation capture settings
+  capture_acts_raw:
+    layers: [24, 27, 31]
+    positions: [-5, -1]  # Negative indices from end of sequence
+  capture_acts_plt:
+    layers: [27]
+    positions: [-5, -1]
+  raw_hook_point: hook_resid_post
+
+  # Feature extraction settings (for attribution)
+  features_max_nodes: 4000
+  features_node_threshold: 0.7
+  features_edge_threshold: 0.98
+
+# GPU Pool - jobs will be distributed across these GPUs
+gpus: [0]
+
+# Default GPUs per ingestion job (dataset).
+num_gpus: 1
+
+# Output directory for all artifacts
+output_dir: /path/to/output  # Update to your desired output directory
+
+# Default number of prompts per dataset (-1 for all)
+num_prompts: 10000
+
+# Full LLM activation capture and ingestion OR evaluator-only mode
+mode: ingest
+
+# Environment variables (optional - set if you want a custom HuggingFace cache location)
+# env:
+#   HF_DATASETS_CACHE: &CACHE_DIR /path/to/hf_cache
+#   HF_HUB_CACHE: *CACHE_DIR
+
+# Log directory (defaults to scripts/logs if not specified)
+# log_dir: /path/to/logs
+
+# Datasets to ingest
+# Each job runs independently on an available GPU
+evaluator_class: &evaluator_class 
+datasets:
+  # 1. Enron - benign business emails
+  - name: enron
+    class: EnronDataset
+    params:
+      split: train
+      include_email_format: false
+    evaluator_class: *evaluator_class
+
+  # 2. SafeGuard - prompt injection detection
+  - name: safeguard
+    class: SafeGuardDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 3. OpenOrca - instruction following
+  - name: openorca
+    class: OpenOrcaDataset
+    params:
+      split: train
+      include_system_prompt: false
+    evaluator_class: *evaluator_class
+
+  # 3b. Dolly 15k - diverse single-turn instructions (+ optional context)
+  - name: dolly_15k
+    class: Dolly15kDataset
+    params:
+      split: train
+      include_context: true
+      store_reference_response: false
+    evaluator_class: *evaluator_class
+
+  # 3c. SoftAge - prompt engineering dataset (gated, requires HF token in env)
+  - name: softAge
+    class: SoftAgeDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 3d. 10k Prompts Ranked - diverse single-turn prompts with quality metadata
+  - name: 10k_prompts_ranked
+    class: PromptsRanked10kDataset
+    params:
+      split: train
+      min_avg_rating: 2.0
+    evaluator_class: *evaluator_class
+
+  # 4. LLMail - email-related prompts
+  - name: llmail
+    class: LLMailDataset
+    params:
+      split: Phase1
+      include_email_format: false
+    evaluator_class: *evaluator_class
+
+  # 5. InjecAgent - tool-use prompt injection
+  # Requires: git clone https://github.com/uiuc-kang-lab/InjecAgent.git
+  - name: injecagent
+    class: InjecAgentDataset
+    params:
+      attack_types: [dh, ds]
+      setting: base
+      injecagent_root: /path/to/InjecAgent  # Update to your cloned repo path
+    evaluator_class: *evaluator_class
+
+  # 6. Deepset - malicious classification
+  - name: deepset
+    class: DeepsetDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 7. Mosscap - password extraction attacks
+  - name: mosscap
+    class: MosscapDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 8. Gandalf Summarization - indirect injection
+  - name: gandalf
+    class: GandalfSummarizationDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 9. Qualifire - jailbreak/benign classification
+  - name: qualifire
+    class: QualifireDataset
+    params:
+      split: test
+    evaluator_class: *evaluator_class
+
+  # 10. Yanismiraoui - multilingual injections
+  - name: yanismiraoui
+    class: YanismiraouiDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 11. Jayavibhav - multi-class safety
+  - name: jayavibhav
+    class: JayavibhavDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 12. WildJailbreak - adversarial jailbreaks
+  - name: wildjailbreak
+    class: WildJailbreakDataset
+    params:
+      split: train
+      subset: eval
+    evaluator_class: *evaluator_class
+
+  # 13. BIPIA - indirect prompt injection
+  # Requires: git clone https://github.com/microsoft/BIPIA.git
+  - name: bipia
+    class: BIPIADataset
+    params:
+      bipia_root: /path/to/BIPIA  # Update to your cloned repo path
+      task_names: [email, code, table]
+      split: train
+      insert_positions: [end, middle]
+      include_clean: true
+    evaluator_class: *evaluator_class
+    num_prompts: 15000
+
+  # 14. AdvBench - adversarial prompts
+  - name: advbench
+    class: AdvBenchDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class
+
+  # 15. HarmBench - adversarial red teaming prompts
+  - name: harmbench
+    class: HarmBenchDataset
+    params:
+      split: train
+    evaluator_class: *evaluator_class

@@ -1,0 +1,88 @@
+# Ingestion Pipeline Configuration (TEST SPLITS ONLY)
+# Usage: python scripts/run_ingestion.py scripts/ingestion_config_test_splits.yaml
+#
+# This file includes ONLY datasets that actually expose a Hugging Face 'test' split.
+# Verified via: scripts/check_hf_test_splits.py
+
+model:
+  name: meta-llama/Llama-3.1-8B-Instruct
+  backend: saelens
+  sae_configs:
+    - sae_release: llama-3.1-8b-instruct-andyrdt
+      sae_id: resid_post_layer_27_trainer_1
+
+gpus: [0]
+num_gpus: 1
+
+# Output directory for all artifacts
+output_dir: /path/to/output  # Update to your desired output directory
+
+# Default number of prompts per dataset (-1 for all)
+num_prompts: -1
+
+# Run configuration
+run:
+  max_new_tokens: 0
+  max_context_length: 16384  # Skip prompts exceeding this token count (prevents OOM)
+  seed: 42
+
+# Environment variables (optional - set if you want a custom HuggingFace cache location)
+# env:
+#   HF_DATASETS_CACHE: &CACHE_DIR /path/to/hf_cache
+#   HF_HUB_CACHE: *CACHE_DIR
+#   HF_HOME: *CACHE_DIR
+
+evaluator_class: &evaluator_class PromptGuardEvaluator
+datasets:
+  - name: enron_test
+    class: EnronDataset
+    params:
+      split: test
+      include_email_format: false
+    evaluator_class: *evaluator_class
+
+  - name: safeguard_test
+    class: SafeGuardDataset
+    params:
+      split: test
+    evaluator_class: *evaluator_class
+
+  - name: deepset_test
+    class: DeepsetDataset
+    params:
+      split: test
+    evaluator_class: *evaluator_class
+
+  - name: mosscap_test
+    class: MosscapDataset
+    params:
+      split: test
+    evaluator_class: *evaluator_class
+
+  - name: gandalf_summarization_test
+    class: GandalfSummarizationDataset
+    params:
+      split: test
+    evaluator_class: *evaluator_class
+
+  - name: qualifire_test
+    class: QualifireDataset
+    params:
+      split: test
+    evaluator_class: *evaluator_class
+
+  - name: jayavibhav_test
+    class: JayavibhavDataset
+    params:
+      split: test
+    evaluator_class: *evaluator_class
+
+
+
+
+
+
+
+
+
+

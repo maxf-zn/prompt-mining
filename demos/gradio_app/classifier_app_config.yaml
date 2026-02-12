@@ -1,0 +1,39 @@
+# Gradio Classifier App Configuration
+# Edit this file to customize the app behavior
+
+# Model configuration
+model:
+  model_name: "meta-llama/Llama-3.1-8B-Instruct"
+  backend: "huggingface"
+  dtype: "float32"
+
+# SAE configuration
+sae:
+  sae_release: "llama-3.1-8b-instruct-andyrdt"
+  sae_id: "resid_post_layer_27_trainer_1"
+  layer: 27
+
+# Classifier configuration
+classifier:
+  # Pre-trained classifier (default - skip training)
+  # Stored next to this config file
+  saved_path: null  # Will default to demos/classifier_l27_sae.joblib
+
+  # Training config (only used if saved_path doesn't exist)
+  dataset_path: "/path/to/ingestion/output"  # Update to your ClassificationDataset path
+  position: "-5"
+  model_type: "logistic"
+  normalize: "l2"
+  C: 1.0
+
+# Interpreter configuration
+interpreter:
+  model_id: "llama3.1-8b-it"
+  neuronpedia_id: "27-resid-post-aa"
+  use_llm_strategy: true
+  llm_context: "malicious prompt classifier"
+
+# UI defaults
+ui:
+  threshold: 0.5
+  top_k_features: 10

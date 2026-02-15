@@ -1,5 +1,7 @@
 # Prompt Mining
 
+<img src="figures/main.png" alt="Prompt Mining" width="600">
+
 Infrastructure for capturing activations and performing mechanistic interpretability research on LLMs.
 
 ## Overview

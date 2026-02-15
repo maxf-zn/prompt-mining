@@ -1,4 +1,4 @@
-# Prompt Mining &nbsp;&nbsp;&nbsp; <img src="figures/Z_labs_logo.png" alt="Z Labs" height="28" style="vertical-align: middle; position: relative; top: 4px;">
+<h1>Prompt Mining &nbsp;&nbsp;&nbsp; <img src="figures/Z_labs_logo.png" alt="Z Labs" height="28" align="center"></h1>
 
 <img src="figures/main.png" alt="Prompt Mining" width="600">
 

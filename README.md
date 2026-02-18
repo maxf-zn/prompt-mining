@@ -329,3 +329,21 @@ pytest                                    # All tests
 pytest test/unit/ -v                      # Unit tests
 pytest --cov=prompt_mining --cov-report=html  # With coverage
 ```
+
+## Paper
+
+For more details, see our paper: [When Benchmarks Lie: Evaluating Malicious Prompt Classifiers Under True Distribution Shift](https://arxiv.org/abs/2602.14161)
+
+If you use this work, please cite:
+
+```bibtex
+@misc{fomin2026benchmarkslieevaluatingmalicious,
+      title={When Benchmarks Lie: Evaluating Malicious Prompt Classifiers Under True Distribution Shift},
+      author={Max Fomin},
+      year={2026},
+      eprint={2602.14161},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2602.14161},
+}
+```

@@ -7,11 +7,23 @@ os.environ["HF_HOME"] = "/data/hf"
 os.environ["TRANSFORMERS_CACHE"] = "/data/hf"
 
 import numpy as np
+import pytest
 import torch
 
 from prompt_mining.model.model_wrapper import ModelConfig, ModelWrapper
 
 
+def _has_hf_auth():
+    """Check if HuggingFace authentication is available."""
+    try:
+        from huggingface_hub import HfApi
+        HfApi().whoami()
+        return True
+    except Exception:
+        return False
+
+
+@pytest.mark.skipif(not _has_hf_auth(), reason="HuggingFace authentication not available")
 def test_backend_parity():
     """Compare activations between SAELens and HuggingFace backends."""
 

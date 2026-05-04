@@ -334,16 +334,14 @@ pytest --cov=prompt_mining --cov-report=html  # With coverage
 
 For more details, see our paper: [When Benchmarks Lie: Evaluating Malicious Prompt Classifiers Under True Distribution Shift](https://arxiv.org/abs/2602.14161)
 
-If you use this work, please cite:
+If you use this work, please consider citing:
 
 ```bibtex
-@misc{fomin2026benchmarkslieevaluatingmalicious,
-      title={When Benchmarks Lie: Evaluating Malicious Prompt Classifiers Under True Distribution Shift},
-      author={Max Fomin},
-      year={2026},
-      eprint={2602.14161},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2602.14161},
+@inproceedings{fomin2026benchmarks,
+    title     = {When Benchmarks Lie: Evaluating Malicious Prompt Classifiers Under True Distribution Shift},
+    author    = {Fomin, Max},
+    booktitle = {ICLR 2026 Workshop on Agents in the Wild: Safety, Security, and Beyond (AIWILD)},
+    year      = {2026},
+    url       = {https://openreview.net/forum?id=jWIOJOQqne}
 }
 ```

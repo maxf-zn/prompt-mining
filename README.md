@@ -319,7 +319,8 @@ prompt_mining/
 ├── registry/       # SQLite run tracking
 └── utils/          # GPU, inference utilities
 
-notebooks/          # Usage examples (see above)
+demos/              # Usage examples: notebooks + Gradio classifier app (see above)
+docs/               # ATTRIBUTION.md — third-party models, data & licenses
 ```
 
 ## Running Tests
@@ -345,3 +346,41 @@ If you use this work, please consider citing:
     url       = {https://openreview.net/forum?id=jWIOJOQqne}
 }
 ```
+
+## License
+
+This repository's own code is licensed under the MIT License — see [`LICENSE`](LICENSE).
+Copyright © 2026 Zenity Ltd. (Z Labs).
+
+The MIT license covers **only the code in this repository**. The models, datasets,
+and third-party libraries this platform loads or integrates with are each governed
+by **their own licenses**, several of which are more restrictive than MIT (gated
+Meta Llama models, dataset-specific and non-commercial terms). You are responsible
+for complying with those upstream terms when you download and use them.
+
+## Models, data & third-party licenses
+
+All external models, datasets, and libraries this project uses — with their
+licenses and the obligations we honor — are documented in
+[`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md). Highlights:
+
+- **Built with Llama.** This project uses Meta's Llama family for its core model
+  and two of its evaluators: `meta-llama/Llama-3.1-8B-Instruct` (target model and
+  `LlamaJudgeEvaluator`), `meta-llama/Llama-Prompt-Guard-2-86M` (`PromptGuardEvaluator`),
+  and `meta-llama/Llama-Guard-3-8B` (`LlamaGuardEvaluator`). Use is governed by the
+  applicable **Llama Community License Agreement** and Meta's **Acceptable Use
+  Policy**; use at or above 700M monthly active users requires a separate license
+  from Meta. Any classifier or artifact you train on Llama activations (e.g. the
+  bundled `demos/gradio_app/*.joblib`) is a Llama derivative and must likewise carry
+  the "Built with Llama" notice and the Llama license.
+- **Gated models.** The three Meta models above are **gated** on Hugging Face — you
+  must accept their licenses on the model page and authenticate (`HF_TOKEN`) before
+  the weights resolve. The Goodfire SAEs and Neuronpedia lookups have their own terms.
+- **Datasets.** The ~16 prompt-injection / safety / instruction datasets are loaded
+  directly from Hugging Face under **their own licenses** (a mix of MIT, Apache-2.0,
+  CC, custom, and some with no stated license). BIPIA and InjecAgent are **not
+  bundled** — you clone them yourself under their own licenses. Verify each dataset's
+  license and terms before redistributing data or derived artifacts. See
+  [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) for the per-source breakdown.
+- **Optional Bedrock/Claude interpretation.** `SAEFeatureInterpreter`'s LLM strategy
+  calls Anthropic Claude via AWS Bedrock, subject to Anthropic's and AWS's terms.
